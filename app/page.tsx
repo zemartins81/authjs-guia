@@ -1,8 +1,8 @@
-import {Button} from "@/components/ui/button";
+import { getCurrentUser } from "@/lib/session"
 
-export default function Home() {
+export default async function Home() {
+    const user = await getCurrentUser()
   return <div className='m-12'>
-    <Button>Clique</Button>
-
+    {JSON.stringify(user)}
   </div>
 }
