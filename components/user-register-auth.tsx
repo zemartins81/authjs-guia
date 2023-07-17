@@ -5,20 +5,21 @@ import {Input} from "@/components/ui/input"
 import {Button} from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-import { signIn  } from "next-auth/react";
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement>{}
+interface UserRegisterFormProps extends React.HTMLAttributes<HTMLDivElement>{}
 
 interface IUser {
+    name: string,
     email: string,
     password: string
 }
 
-export function UserLoginForm({ className, ...props }): UserAuthFormProps{
+export function UserRegisterForm({ className, ...props }: UserRegisterFormProps) {
 
     const [data, setData] = useState<IUser>({
+        name: "",
         email:"",
-        password: ""
+        password: "",
     })
 
     const [isLoading, setIsLoading ] = useState<boolean>(false)
@@ -27,12 +28,23 @@ export function UserLoginForm({ className, ...props }): UserAuthFormProps{
         event.preventDefault()
         setIsLoading(true)
 
-        const res = await signIn<"credentials">("credentials", {
-            ...data,
-            redirect: false
+        const request = await fetch("/api/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+            body: JSON.stringify(data),
         })
 
+        const response = await request.json()
+
+        if(!request.ok) {
+            throw new Error(response.message)
+        }
+
+
         setData({
+            name: "",
             email: "",
             password: "",
         })
@@ -42,16 +54,28 @@ export function UserLoginForm({ className, ...props }): UserAuthFormProps{
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>){
         setData((prev) => {
-
             return { ...prev, [e.target.name]: e.target.value }
-
-name        })
+        })
     }
 
-    return (
+  return (
         <div className={cn("grid gap-6", className)} {...props}>
             <form onSubmit={onSubmit}>
                 <div className="grid gap-2">
+                <div className="grid gap-1">
+                        <Label className="sr-only" htmlFor="name">
+                            Nome
+                        </Label>
+                        <Input
+                            id="name"
+                            placeholder="Nome completo"
+                            type="text"
+                            disabled={isLoading}
+                            name="name"
+                            value={data.name}
+                            onChange={handleChange}
+                        />
+                    </div>
                     <div className="grid gap-1">
                         <Label className="sr-only" htmlFor="email">
                             Email
