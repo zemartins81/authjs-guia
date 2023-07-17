@@ -3,10 +3,15 @@ import {Label} from "@/components/ui/label"
 import React, {useState} from "react"
 import {Input} from "@/components/ui/input"
 import {Button} from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import {cn} from "@/lib/utils"
+import {Icons} from "@/components/ui/icons"
+import {useToast} from "@/components/ui/use-toast";
+import {ToastAction} from "@/components/ui/toast";
+import {useRouter} from "next/navigation";
 
 
-interface UserRegisterFormProps extends React.HTMLAttributes<HTMLDivElement>{}
+interface UserRegisterFormProps extends React.HTMLAttributes<HTMLDivElement> {
+}
 
 interface IUser {
     name: string,
@@ -14,15 +19,18 @@ interface IUser {
     password: string
 }
 
-export function UserRegisterForm({ className, ...props }: UserRegisterFormProps) {
+export function UserRegisterForm({className, ...props}: UserRegisterFormProps) {
+
+    const {toast} = useToast()
+    const router = useRouter()
 
     const [data, setData] = useState<IUser>({
         name: "",
-        email:"",
+        email: "",
         password: "",
     })
 
-    const [isLoading, setIsLoading ] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     async function onSubmit(event: React.SyntheticEvent) {
         event.preventDefault()
@@ -32,14 +40,23 @@ export function UserRegisterForm({ className, ...props }: UserRegisterFormProps)
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-            }
+            },
             body: JSON.stringify(data),
         })
 
         const response = await request.json()
 
-        if(!request.ok) {
-            throw new Error(response.message)
+        if (!request.ok) {
+            toast({
+                title: "Erro no cadastro",
+                description: response.error,
+                variant: "destructive",
+                action: (
+                    <ToastAction altText="Tente outra vez...">Tente Outra Vez...</ToastAction>
+                )
+            })
+        } else {
+            router.push("/login")
         }
 
 
@@ -52,17 +69,17 @@ export function UserRegisterForm({ className, ...props }: UserRegisterFormProps)
         setIsLoading(false)
     }
 
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>){
+    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setData((prev) => {
-            return { ...prev, [e.target.name]: e.target.value }
+            return {...prev, [e.target.name]: e.target.value}
         })
     }
 
-  return (
+    return (
         <div className={cn("grid gap-6", className)} {...props}>
             <form onSubmit={onSubmit}>
                 <div className="grid gap-2">
-                <div className="grid gap-1">
+                    <div className="grid gap-1">
                         <Label className="sr-only" htmlFor="name">
                             Nome
                         </Label>
@@ -111,13 +128,12 @@ export function UserRegisterForm({ className, ...props }: UserRegisterFormProps)
                     </div>
                     <Button disabled={isLoading}>
                         {isLoading && (
-                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin"
+                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                         )}
-                                Entrar
+                        Entrar
                     </Button>
                 </div>
             </form>
-
         </div>
     )
 }

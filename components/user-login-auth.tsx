@@ -3,25 +3,27 @@ import {Label} from "@/components/ui/label"
 import React, {useState} from "react"
 import {Input} from "@/components/ui/input"
 import {Button} from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import {cn} from "@/lib/utils"
+import {Icons} from "@/components/ui/icons"
 
-import { signIn  } from "next-auth/react";
+import {signIn} from "next-auth/react";
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement>{}
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
+}
 
 interface IUser {
     email: string,
     password: string
 }
 
-export function UserLoginForm({ className, ...props }): UserAuthFormProps{
+export function UserLoginForm({className, ...props}): UserAuthFormProps {
 
     const [data, setData] = useState<IUser>({
-        email:"",
+        email: "",
         password: ""
     })
 
-    const [isLoading, setIsLoading ] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     async function onSubmit(event: React.SyntheticEvent) {
         event.preventDefault()
@@ -36,16 +38,17 @@ export function UserLoginForm({ className, ...props }): UserAuthFormProps{
             email: "",
             password: "",
         })
+        router.push("/")
 
         setIsLoading(false)
     }
 
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>){
+    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setData((prev) => {
 
-            return { ...prev, [e.target.name]: e.target.value }
+            return {...prev, [e.target.name]: e.target.value}
 
-name        })
+        })
     }
 
     return (
@@ -87,13 +90,12 @@ name        })
                     </div>
                     <Button disabled={isLoading}>
                         {isLoading && (
-                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin"
+                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                         )}
-                                Entrar
+                        Entrar
                     </Button>
                 </div>
             </form>
-
         </div>
     )
 }
